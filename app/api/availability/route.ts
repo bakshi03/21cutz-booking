@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCalendar, CALENDAR_ID } from '@/lib/calendar'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,9 +7,17 @@ export async function GET(request: NextRequest) {
   if (!date) return NextResponse.json({ takenSlots: [] })
 
   try {
-    const calendar = getCalendar()
+    const { google } = await import('googleapis')
+    const auth = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    )
+    auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN })
+    const calendar = google.calendar({ version: 'v3', auth })
+
     const res = await calendar.events.list({
-      calendarId: CALENDAR_ID,
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
       timeMin: new Date(`${date}T00:00:00`).toISOString(),
       timeMax: new Date(`${date}T23:59:59`).toISOString(),
       singleEvents: true,
