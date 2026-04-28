@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { SERVICES, generateTimeSlots, WORKING_HOURS } from '@/lib/calendar'
+import { SERVICES, generateTimeSlots, WORKING_HOURS } from '@/lib/config'
 
 type Step = 'service' | 'date' | 'time' | 'details' | 'success'
 
