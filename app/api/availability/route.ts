@@ -8,12 +8,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const { google } = await import('googleapis')
-    const auth = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
-    )
-    auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN })
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/calendar'],
+    })
     const calendar = google.calendar({ version: 'v3', auth })
 
     const res = await calendar.events.list({
