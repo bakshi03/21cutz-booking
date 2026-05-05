@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       requestBody: {
         summary: `✂️ ${service} — ${name}`,
         description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}`,
-        start: { dateTime: `${date}T${h}:${m}:00`, timeZone: 'Europe/Sofia' },
-        end: { dateTime: `${date}T${endH}:${endM}:00`, timeZone: 'Europe/Sofia' },
+        start: { dateTime: `${date}T${h}:${m}:00+03:00` },
+        end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
       },
     })
 
