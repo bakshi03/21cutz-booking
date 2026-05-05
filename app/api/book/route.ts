@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const auth = new google.auth.GoogleAuth({
       credentials: {
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        private_key: (process.env.GOOGLE_PRIVATE_KEY || '').split('\\n').join('\n'),
       },
       scopes: ['https://www.googleapis.com/auth/calendar'],
     })
@@ -21,16 +21,20 @@ export async function POST(request: NextRequest) {
 
     const h = time.split(':')[0].padStart(2, '0')
     const m = time.split(':')[1] || '00'
-    const start = new Date(`${date}T${h}:${m}:00`)
-    const end = new Date(start.getTime() + (duration || 30) * 60000)
+    const durationMin = duration || 30
+    
+    // Calculate end time
+    const totalMinutes = parseInt(h) * 60 + parseInt(m) + durationMin
+    const endH = Math.floor(totalMinutes / 60).toString().padStart(2, '0')
+    const endM = (totalMinutes % 60).toString().padStart(2, '0')
 
     await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
       requestBody: {
         summary: `✂️ ${service} — ${name}`,
         description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}`,
-        start: { dateTime: start.toISOString(), timeZone: 'Europe/Sofia' },
-        end: { dateTime: end.toISOString(), timeZone: 'Europe/Sofia' },
+        start: { dateTime: `${date}T${h}:${m}:00`, timeZone: 'Europe/Sofia' },
+        end: { dateTime: `${date}T${endH}:${endM}:00`, timeZone: 'Europe/Sofia' },
       },
     })
 
