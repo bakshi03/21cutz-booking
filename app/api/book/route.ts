@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         summary: `✂️ ${service} — ${name}`,
         description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}`,
         start: { dateTime: `${date}T${h}:${m}:00+03:00` },
-        end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
+end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
       },
     })
 
