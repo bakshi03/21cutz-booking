@@ -10,7 +10,7 @@ const DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд']
 
 function pad(n: number) { return String(n).padStart(2,'0') }
 function dateStr(d: Date) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}` }
-function dow(d: Date) { return (d.getDay() + 6) % 7 } // Mon=0
+function dow(d: Date) { return (d.getDay() + 6) % 7 }
 
 export default function Page() {
   const [step, setStep] = useState<Step>('service')
@@ -18,7 +18,10 @@ export default function Page() {
   const [month, setMonth] = useState(new Date())
   const [selDate, setSelDate] = useState('')
   const [takenSlots, setTakenSlots] = useState<string[]>([])
+  const [blockedDates, setBlockedDates] = useState<string[]>([])
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [loadingMonth, setLoadingMonth] = useState(false)
+  const [fullyBlocked, setFullyBlocked] = useState(false)
   const [selTime, setSelTime] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -28,28 +31,52 @@ export default function Page() {
 
   const today = new Date(); today.setHours(0,0,0,0)
 
-  const isAvailableDay = (d: Date) => {
-    if (d < today) return false
-    const w = (d.getDay() + 6) % 7 // Mon=0, Sun=6
-    const googleDow = d.getDay() // 0=Sun,1=Mon...
-    return WORKING_HOURS[googleDow] !== null
-  }
+  // Fetch busy days for current month
+  const fetchBusyDays = useCallback(async (m: Date) => {
+    setLoadingMonth(true)
+    try {
+      const monthStr = `${m.getFullYear()}-${pad(m.getMonth()+1)}`
+      const r = await fetch(`/api/busy-days?month=${monthStr}`)
+      const d = await r.json()
+      setBlockedDates(d.blockedDates || [])
+    } catch { setBlockedDates([]) }
+    finally { setLoadingMonth(false) }
+  }, [])
 
+  // Fetch taken slots for selected date
   const fetchSlots = useCallback(async (date: string) => {
     setLoadingSlots(true)
     setTakenSlots([])
+    setFullyBlocked(false)
     try {
       const r = await fetch(`/api/availability?date=${date}`)
       const d = await r.json()
-      setTakenSlots(d.takenSlots || [])
+      if (d.fullyBlocked) {
+        setFullyBlocked(true)
+      } else {
+        setTakenSlots(d.takenSlots || [])
+      }
     } catch { setTakenSlots([]) }
     finally { setLoadingSlots(false) }
   }, [])
 
+  // Fetch busy days when month changes
+  useEffect(() => { fetchBusyDays(month) }, [month, fetchBusyDays])
+
+  // Fetch slots when date changes
   useEffect(() => { if (selDate) fetchSlots(selDate) }, [selDate, fetchSlots])
 
+  const isAvailableDay = (d: Date) => {
+    if (d < today) return false
+    const googleDow = d.getDay()
+    if (WORKING_HOURS[googleDow] === null) return false
+    const ds = dateStr(d)
+    if (blockedDates.includes(ds)) return false
+    return true
+  }
+
   const availableSlots = (() => {
-    if (!selDate || !service) return []
+    if (!selDate || !service || fullyBlocked) return []
     const d = new Date(selDate + 'T12:00:00')
     const slots = generateTimeSlots(d.getDay())
     const now = new Date()
@@ -82,7 +109,6 @@ export default function Page() {
     finally { setSubmitting(false) }
   }
 
-  // Calendar
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1)
   const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0)
   const startPad = dow(firstDay)
@@ -162,7 +188,9 @@ export default function Page() {
             <div style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 14px', marginBottom: 20, fontSize: 13, color: 'var(--gold)' }}>
               {service?.name} — {service?.price}
             </div>
-            <div style={s.label}>Изберете дата</div>
+            <div style={s.label}>
+              {loadingMonth ? 'Зареждане на календара...' : 'Изберете дата'}
+            </div>
             <div style={s.calHead}>
               <button style={{ ...s.back, marginBottom: 0 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()-1))}>‹</button>
               <span style={{ fontWeight: 600 }}>{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
@@ -175,6 +203,7 @@ export default function Page() {
                 const ds = dateStr(d)
                 const avail = isAvailableDay(d)
                 const sel = selDate === ds
+                const blocked = blockedDates.includes(ds)
                 return (
                   <button key={ds} disabled={!avail}
                     onClick={() => { setSelDate(ds); setSelTime(''); setStep('time') }}
@@ -183,7 +212,7 @@ export default function Page() {
                       borderRadius: 4, fontSize: 13, cursor: avail ? 'pointer' : 'not-allowed',
                       background: sel ? 'var(--gold)' : 'none',
                       color: sel ? '#0f0f0f' : avail ? 'var(--text)' : 'var(--muted)',
-                      border: sel ? 'none' : '1px solid transparent',
+                      border: sel ? 'none' : blocked ? '1px solid rgba(239,68,68,0.3)' : '1px solid transparent',
                       opacity: avail ? 1 : 0.3,
                       fontWeight: sel ? 700 : 400,
                     }}
@@ -202,7 +231,10 @@ export default function Page() {
               <span style={{ color: 'var(--gold)' }}>{service?.name}</span> · {selDate}
             </div>
             <div style={s.label}>{loadingSlots ? 'Зареждане...' : 'Изберете час'}</div>
-            {!loadingSlots && availableSlots.length === 0 && (
+            {!loadingSlots && fullyBlocked && (
+              <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 20 }}>Денят е блокиран. Изберете друга дата.</p>
+            )}
+            {!loadingSlots && !fullyBlocked && availableSlots.length === 0 && (
               <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 20 }}>Няма свободни часове. Изберете друга дата.</p>
             )}
             <div style={s.timeGrid}>

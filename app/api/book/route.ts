@@ -23,10 +23,13 @@ export async function POST(request: NextRequest) {
     const m = time.split(':')[1] || '00'
     const durationMin = duration || 30
     
-    // Calculate end time
     const totalMinutes = parseInt(h) * 60 + parseInt(m) + durationMin
     const endH = Math.floor(totalMinutes / 60).toString().padStart(2, '0')
     const endM = (totalMinutes % 60).toString().padStart(2, '0')
+
+    console.log('Time received:', time)
+    console.log('Start dateTime:', `${date}T${h}:${m}:00+03:00`)
+    console.log('End dateTime:', `${date}T${endH}:${endM}:00+03:00`)
 
     await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
         summary: `✂️ ${service} — ${name}`,
         description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}`,
         start: { dateTime: `${date}T${h}:${m}:00+03:00` },
-end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
+        end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
       },
     })
 
