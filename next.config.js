@@ -1,8 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  experimental: {
-    serverComponentsExternalPackages: ['googleapis', 'google-auth-library', 'gcp-metadata', 'gtoken'],
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        net: false,
+        tls: false,
+        fs: false,
+        http2: false,
+        dns: false,
+        child_process: false,
+      }
+    }
+    return config
   },
 }
 
