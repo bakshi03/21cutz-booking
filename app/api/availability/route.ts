@@ -15,6 +15,22 @@ function toSofiaTime(dateTimeStr: string): string {
   return `${parseInt(hour)}:${minute.padStart(2, '0')}`
 }
 
+// Генерира всички 30-мин слотове които едно събитие покрива
+// Пример: 13:30–14:30 → ["13:30", "14:00"]
+function getSlotsForEvent(startStr: string, endStr: string): string[] {
+  const slots: string[] = []
+  const start = new Date(startStr)
+  const end = new Date(endStr)
+  const current = new Date(start)
+
+  while (current < end) {
+    slots.push(toSofiaTime(current.toISOString()))
+    current.setMinutes(current.getMinutes() + 30)
+  }
+
+  return slots
+}
+
 export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get('date')
   console.log('Availability called for date:', date)
@@ -44,7 +60,10 @@ export async function GET(request: NextRequest) {
     })
 
     const items = res.data.items || []
-    console.log('Events found:', items.length, items.map(e => e.start?.dateTime || e.start?.date))
+    console.log('Events found:', items.length, items.map(e => ({
+      start: e.start?.dateTime || e.start?.date,
+      end: e.end?.dateTime || e.end?.date,
+    })))
 
     const fullyBlocked = items.some(e => e.start?.date && !e.start?.dateTime)
     if (fullyBlocked) {
@@ -52,11 +71,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ takenSlots: [], fullyBlocked: true })
     }
 
-    const takenSlots = items
-      .filter(e => e.start?.dateTime)
-      .map(e => toSofiaTime(e.start!.dateTime!))
+    // За всяко събитие генерираме всички слотове които покрива
+    const takenSlotsSet = new Set<string>()
+    for (const event of items) {
+      if (event.start?.dateTime && event.end?.dateTime) {
+        const slots = getSlotsForEvent(event.start.dateTime, event.end.dateTime)
+        slots.forEach(s => takenSlotsSet.add(s))
+      }
+    }
 
-    console.log('Date:', date, 'Taken slots:', takenSlots)
+    const takenSlots = Array.from(takenSlotsSet)
+    console.log('Date:', date, 'Taken slots (expanded):', takenSlots)
 
     return NextResponse.json({ takenSlots, fullyBlocked: false })
   } catch (err) {
