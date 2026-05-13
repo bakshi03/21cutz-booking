@@ -102,7 +102,8 @@ export default function Page() {
       if ((dt.getTime() - now.getTime()) / 3600000 < 12) return false
       if (takenSlots.includes(slot)) return false
       if (service.duration === 60) {
-        const next = `${Math.floor((h*60+m+30)/60)}:${pad((h*60+m+30)%60)}`
+        const nextTotal = h * 60 + m + 30
+const next = `${pad(Math.floor(nextTotal / 60))}:${pad(nextTotal % 60)}`
         if (takenSlots.includes(next) || !slots.includes(next)) return false
       }
       return true
