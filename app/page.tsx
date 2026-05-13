@@ -18,6 +18,7 @@ export default function Page() {
   const [month, setMonth] = useState(new Date())
   const [selDate, setSelDate] = useState('')
   const [takenSlots, setTakenSlots] = useState<string[]>([])
+  const [slotsLoaded, setSlotsLoaded] = useState(false)
   const [blockedDates, setBlockedDates] = useState<string[]>([])
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [loadingMonth, setLoadingMonth] = useState(false)
@@ -31,40 +32,55 @@ export default function Page() {
 
   const today = new Date(); today.setHours(0,0,0,0)
 
-  // Fetch busy days for current month
   const fetchBusyDays = useCallback(async (m: Date) => {
     setLoadingMonth(true)
     try {
       const monthStr = `${m.getFullYear()}-${pad(m.getMonth()+1)}`
+      console.log('Fetching busy days for:', monthStr)
       const r = await fetch(`/api/busy-days?month=${monthStr}`)
       const d = await r.json()
+      console.log('Blocked dates:', d.blockedDates)
       setBlockedDates(d.blockedDates || [])
-    } catch { setBlockedDates([]) }
+    } catch (e) {
+      console.error('fetchBusyDays error:', e)
+      setBlockedDates([])
+    }
     finally { setLoadingMonth(false) }
   }, [])
 
-  // Fetch taken slots for selected date
   const fetchSlots = useCallback(async (date: string) => {
+    console.log('fetchSlots called for:', date)
     setLoadingSlots(true)
+    setSlotsLoaded(false)
     setTakenSlots([])
     setFullyBlocked(false)
     try {
       const r = await fetch(`/api/availability?date=${date}`)
       const d = await r.json()
+      console.log('Availability response:', d)
       if (d.fullyBlocked) {
         setFullyBlocked(true)
       } else {
         setTakenSlots(d.takenSlots || [])
       }
-    } catch { setTakenSlots([]) }
-    finally { setLoadingSlots(false) }
+    } catch (e) {
+      console.error('fetchSlots error:', e)
+      setTakenSlots([])
+    }
+    finally {
+      setLoadingSlots(false)
+      setSlotsLoaded(true)
+    }
   }, [])
 
-  // Fetch busy days when month changes
   useEffect(() => { fetchBusyDays(month) }, [month, fetchBusyDays])
 
-  // Fetch slots when date changes
-  useEffect(() => { if (selDate) fetchSlots(selDate) }, [selDate, fetchSlots])
+  useEffect(() => {
+    if (selDate) {
+      setSlotsLoaded(false)
+      fetchSlots(selDate)
+    }
+  }, [selDate, fetchSlots])
 
   const isAvailableDay = (d: Date) => {
     if (d < today) return false
@@ -76,7 +92,7 @@ export default function Page() {
   }
 
   const availableSlots = (() => {
-    if (!selDate || !service || fullyBlocked) return []
+    if (!selDate || !service || fullyBlocked || !slotsLoaded) return []
     const d = new Date(selDate + 'T12:00:00')
     const slots = generateTimeSlots(d.getDay())
     const now = new Date()
@@ -143,7 +159,6 @@ export default function Page() {
 
       <div style={s.wrap}>
 
-        {/* SUCCESS */}
         {step === 'success' && (
           <div style={s.success} className="fade">
             <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
@@ -159,7 +174,6 @@ export default function Page() {
           </div>
         )}
 
-        {/* STEP 1 — SERVICE */}
         {step === 'service' && (
           <div className="fade">
             <div style={{ marginBottom: 20, marginTop: 28 }}>
@@ -181,7 +195,6 @@ export default function Page() {
           </div>
         )}
 
-        {/* STEP 2 — DATE */}
         {step === 'date' && (
           <div className="fade">
             <button style={s.back} onClick={() => setStep('service')}>← Назад</button>
@@ -223,7 +236,6 @@ export default function Page() {
           </div>
         )}
 
-        {/* STEP 3 — TIME */}
         {step === 'time' && (
           <div className="fade">
             <button style={s.back} onClick={() => setStep('date')}>← Назад</button>
@@ -231,14 +243,17 @@ export default function Page() {
               <span style={{ color: 'var(--gold)' }}>{service?.name}</span> · {selDate}
             </div>
             <div style={s.label}>{loadingSlots ? 'Зареждане...' : 'Изберете час'}</div>
-            {!loadingSlots && fullyBlocked && (
+            {!loadingSlots && slotsLoaded && fullyBlocked && (
               <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 20 }}>Денят е блокиран. Изберете друга дата.</p>
             )}
-            {!loadingSlots && !fullyBlocked && availableSlots.length === 0 && (
+            {!loadingSlots && slotsLoaded && !fullyBlocked && availableSlots.length === 0 && (
               <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 20 }}>Няма свободни часове. Изберете друга дата.</p>
             )}
+            {loadingSlots && (
+              <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 20 }}>Зареждане на свободните часове...</p>
+            )}
             <div style={s.timeGrid}>
-              {availableSlots.map(slot => (
+              {slotsLoaded && availableSlots.map(slot => (
                 <button key={slot}
                   onClick={() => { setSelTime(slot); setStep('details') }}
                   style={{
@@ -252,13 +267,12 @@ export default function Page() {
                 >{slot}</button>
               ))}
             </div>
-            {!loadingSlots && availableSlots.length > 0 && (
+            {slotsLoaded && !loadingSlots && availableSlots.length > 0 && (
               <button style={{ ...s.back, marginTop: 12 }} onClick={() => setStep('date')}>← Избери друга дата</button>
             )}
           </div>
         )}
 
-        {/* STEP 4 — DETAILS */}
         {step === 'details' && (
           <div className="fade">
             <button style={s.back} onClick={() => setStep('time')}>← Назад</button>
