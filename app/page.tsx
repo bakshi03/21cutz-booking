@@ -119,7 +119,7 @@ export default function Page() {
       const r = await fetch('/api/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, service: service?.name, date: selDate, time: selTime, duration: service?.duration }),
+        body: JSON.stringify({ name, email, phone, service: service?.name, date: selDate, time: selTime, duration: service?.duration, price: service?.price }),
       })
       const d = await r.json()
       if (d.success) setStep('success')
