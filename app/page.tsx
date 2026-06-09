@@ -29,6 +29,8 @@ export default function Page() {
   const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [showPriceNotice, setShowPriceNotice] = useState(false)
+  const [pendingService, setPendingService] = useState<typeof SERVICES[0] | null>(null)
 
   const today = new Date(); today.setHours(0,0,0,0)
 
@@ -103,7 +105,7 @@ export default function Page() {
       if (takenSlots.includes(slot)) return false
       if (service.duration === 60) {
         const nextTotal = h * 60 + m + 30
-const next = `${pad(Math.floor(nextTotal / 60))}:${pad(nextTotal % 60)}`
+        const next = `${pad(Math.floor(nextTotal / 60))}:${pad(nextTotal % 60)}`
         if (takenSlots.includes(next) || !slots.includes(next)) return false
       }
       return true
@@ -183,7 +185,7 @@ const next = `${pad(Math.floor(nextTotal / 60))}:${pad(nextTotal % 60)}`
                 <button key={svc.name} style={s.svcBtn}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold)' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
-                  onClick={() => { setService(svc); setStep('date') }}
+                  onClick={() => { setPendingService(svc); setShowPriceNotice(true) }}
                 >
                   <div style={{ textAlign: 'left' }}>
                     <div style={{ fontSize: 15 }}>{svc.name}</div>
@@ -293,6 +295,52 @@ const next = `${pad(Math.floor(nextTotal / 60))}:${pad(nextTotal % 60)}`
         )}
 
       </div>
+
+      {/* Price notice modal */}
+      {showPriceNotice && pendingService && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, padding: '0 20px',
+        }}>
+          <div style={{
+            background: 'var(--bg2)', border: '1px solid var(--gold)',
+            borderRadius: 10, padding: '28px 24px', maxWidth: 380, width: '100%',
+          }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', marginBottom: 12 }}>
+              💈 Актуализирани цени
+            </div>
+            <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+              От <span style={{ color: 'var(--text)' }}>09.06.2026</span> цените в салон <span style={{ color: 'var(--gold)' }}>21 Cutz</span> са актуализирани. Продължаваме да предлагаме същото премиум качество на обслужване.
+            </p>
+            <div style={{
+              background: 'rgba(201,168,76,0.08)', border: '1px solid var(--border)',
+              borderRadius: 6, padding: '12px 14px', marginBottom: 20,
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}>
+              <div>
+                <div style={{ fontSize: 14, color: 'var(--text)' }}>{pendingService.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{pendingService.duration} мин.</div>
+              </div>
+              <div style={{ color: 'var(--gold)', fontWeight: 700, fontSize: 18 }}>{pendingService.price}</div>
+            </div>
+            <button style={s.btn} onClick={() => {
+              setService(pendingService)
+              setShowPriceNotice(false)
+              setPendingService(null)
+              setStep('date')
+            }}>
+              Продължи към резервация
+            </button>
+            <button
+              style={{ ...s.back, display: 'block', width: '100%', textAlign: 'center', marginTop: 12, marginBottom: 0 }}
+              onClick={() => { setShowPriceNotice(false); setPendingService(null) }}
+            >
+              ← Назад
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }
