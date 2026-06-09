@@ -208,9 +208,9 @@ export default function Page() {
               {loadingMonth ? 'Зареждане на календара...' : 'Изберете дата'}
             </div>
             <div style={s.calHead}>
-              <button style={{ ...s.back, marginBottom: 0 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()-1))}>‹</button>
+            <button style={{ ...s.back, marginBottom: 0, fontSize: 24, color: 'var(--gold)', padding: '0 8px', lineHeight: 1 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()-1))}>‹</button>
               <span style={{ fontWeight: 600 }}>{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
-              <button style={{ ...s.back, marginBottom: 0 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()+1))}>›</button>
+              <button style={{ ...s.back, marginBottom: 0, fontSize: 24, color: 'var(--gold)', padding: '0 8px', lineHeight: 1 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()+1))}>›</button>
             </div>
             <div style={s.calGrid}>
               {DAYS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: 11, color: 'var(--muted)', padding: '4px 0' }}>{d}</div>)}
