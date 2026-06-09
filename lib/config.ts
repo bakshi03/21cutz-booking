@@ -26,11 +26,9 @@ export function generateTimeSlots(dayOfWeek: number): string[] {
 }
 
 export const SERVICES = [
-  { name: 'Класическо подстригване', price: '15€', duration: 30 },
-  { name: 'Buzz cut', price: '15€', duration: 30 },
-  { name: 'Брада', price: '10€', duration: 30 },
-  { name: 'Подстригване + брада', price: '20€', duration: 60 },
-  { name: 'Вежди', price: '2.50€', duration: 30 },
-  { name: 'VIP комбо подстригване + брада + кална маска + масаж', price: '25€', duration: 60 },
-  { name: 'Грижа за кожата', price: '5€', duration: 30 },
+  { name: 'Мъжко подстригване', price: '20€', duration: 30 },
+  { name: 'Подстригване и брада', price: '25€', duration: 60 },
+  { name: 'Оформяне на брада', price: '15€', duration: 30 },
+  { name: 'Вежди', price: '10€', duration: 30 },
+  { name: 'VIP комбо (подстригване, оформяне на брада, вежди, маска за лице, тонизиращ масаж)', price: '40€', duration: 60 },
 ]
