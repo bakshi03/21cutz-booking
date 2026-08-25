@@ -4,10 +4,13 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, phone, service, date, time, duration, price } = await request.json()
+    const { name, email, phone, service, date, time, duration, price, barberId } = await request.json()
     if (!name || !email || !phone || !service || !date || !time) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
     }
+
+    const barber = barberId === 'emo' ? 'emo' : 'edi'
+    const barberName = barber === 'emo' ? 'Емо' : 'Еди'
 
     const { google } = await import('googleapis')
     const auth = new google.auth.GoogleAuth({
@@ -18,6 +21,7 @@ export async function POST(request: NextRequest) {
       scopes: ['https://www.googleapis.com/auth/calendar'],
     })
     const calendar = google.calendar({ version: 'v3', auth })
+    const calendarId = barber === 'emo' ? process.env.GOOGLE_CALENDAR_ID_EMO : process.env.GOOGLE_CALENDAR_ID
 
     const h = time.split(':')[0].padStart(2, '0')
     const m = time.split(':')[1] || '00'
@@ -32,10 +36,10 @@ export async function POST(request: NextRequest) {
     console.log('End dateTime:', `${date}T${endH}:${endM}:00+03:00`)
 
     await calendar.events.insert({
-      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      calendarId: calendarId || 'primary',
       requestBody: {
         summary: `✂️ ${service} — ${name}`,
-        description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}`,
+        description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}\nБръснар: ${barberName}`,
         start: { dateTime: `${date}T${h}:${m}:00+03:00` },
         end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
       },
@@ -78,7 +82,7 @@ export async function POST(request: NextRequest) {
                     </tr>
                     <tr>
                       <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Бръснар</td>
-                      <td style="color: #e5e5e5; font-size: 14px; text-align: right; padding: 6px 0;">Еди</td>
+                      <td style="color: #e5e5e5; font-size: 14px; text-align: right; padding: 6px 0;">${barberName}</td>
                     </tr>
                     <tr style="border-top: 1px solid #2a2a2a;">
                       <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 12px 0 6px;">Цена</td>

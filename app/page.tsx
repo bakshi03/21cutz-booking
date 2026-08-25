@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { SERVICES, generateTimeSlots, WORKING_HOURS } from '@/lib/config'
+import { BARBERS, generateTimeSlots, BarberId } from '@/lib/config'
 
-type Step = 'service' | 'date' | 'time' | 'details' | 'success'
+type Step = 'barber' | 'service' | 'date' | 'time' | 'details' | 'success'
 
 const MONTHS = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември']
 const DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд']
@@ -13,7 +13,10 @@ function dateStr(d: Date) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${
 function dow(d: Date) { return (d.getDay() + 6) % 7 }
 
 export default function Page() {
-  const [step, setStep] = useState<Step>('service')
+  const [step, setStep] = useState<Step>('barber')
+  const [barberId, setBarberId] = useState<BarberId | null>(null)
+  const barber = BARBERS.find(b => b.id === barberId) || null
+  const SERVICES = barber ? barber.services : BARBERS[0].services
   const [service, setService] = useState<typeof SERVICES[0] | null>(null)
   const [month, setMonth] = useState(new Date())
   const [selDate, setSelDate] = useState('')
@@ -34,12 +37,12 @@ export default function Page() {
 
   const today = new Date(); today.setHours(0,0,0,0)
 
-  const fetchBusyDays = useCallback(async (m: Date) => {
+  const fetchBusyDays = useCallback(async (m: Date, bId: BarberId) => {
     setLoadingMonth(true)
     try {
       const monthStr = `${m.getFullYear()}-${pad(m.getMonth()+1)}`
       console.log('Fetching busy days for:', monthStr)
-      const r = await fetch(`/api/busy-days?month=${monthStr}`)
+      const r = await fetch(`/api/busy-days?month=${monthStr}&barberId=${bId}`)
       const d = await r.json()
       console.log('Blocked dates:', d.blockedDates)
       setBlockedDates(d.blockedDates || [])
@@ -50,14 +53,14 @@ export default function Page() {
     finally { setLoadingMonth(false) }
   }, [])
 
-  const fetchSlots = useCallback(async (date: string) => {
+  const fetchSlots = useCallback(async (date: string, bId: BarberId) => {
     console.log('fetchSlots called for:', date)
     setLoadingSlots(true)
     setSlotsLoaded(false)
     setTakenSlots([])
     setFullyBlocked(false)
     try {
-      const r = await fetch(`/api/availability?date=${date}`)
+      const r = await fetch(`/api/availability?date=${date}&barberId=${bId}`)
       const d = await r.json()
       console.log('Availability response:', d)
       if (d.fullyBlocked) {
@@ -75,28 +78,29 @@ export default function Page() {
     }
   }, [])
 
-  useEffect(() => { fetchBusyDays(month) }, [month, fetchBusyDays])
+  useEffect(() => { if (barberId) fetchBusyDays(month, barberId) }, [month, barberId, fetchBusyDays])
 
   useEffect(() => {
-    if (selDate) {
+    if (selDate && barberId) {
       setSlotsLoaded(false)
-      fetchSlots(selDate)
+      fetchSlots(selDate, barberId)
     }
-  }, [selDate, fetchSlots])
+  }, [selDate, barberId, fetchSlots])
 
   const isAvailableDay = (d: Date) => {
     if (d < today) return false
+    if (!barber) return false
     const googleDow = d.getDay()
-    if (WORKING_HOURS[googleDow] === null) return false
+    if (barber.workingHours[googleDow] === null) return false
     const ds = dateStr(d)
     if (blockedDates.includes(ds)) return false
     return true
   }
 
   const availableSlots = (() => {
-    if (!selDate || !service || fullyBlocked || !slotsLoaded) return []
+    if (!selDate || !service || !barber || fullyBlocked || !slotsLoaded) return []
     const d = new Date(selDate + 'T12:00:00')
-    const slots = generateTimeSlots(d.getDay())
+    const slots = generateTimeSlots(d.getDay(), barber.workingHours)
     const now = new Date()
     return slots.filter(slot => {
       const [h, m] = slot.split(':').map(Number)
@@ -119,7 +123,7 @@ export default function Page() {
       const r = await fetch('/api/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, service: service?.name, date: selDate, time: selTime, duration: service?.duration, price: service?.price }),
+        body: JSON.stringify({ name, email, phone, service: service?.name, date: selDate, time: selTime, duration: service?.duration, price: service?.price, barberId }),
       })
       const d = await r.json()
       if (d.success) setStep('success')
@@ -169,18 +173,46 @@ export default function Page() {
             <div style={{ color: 'var(--muted)', lineHeight: 1.8, marginBottom: 24 }}>
               <div>{service?.name}</div>
               <div style={{ color: 'var(--gold)' }}>{selDate} в {selTime} ч.</div>
-              <div>Бръснар: Еди</div>
+              <div>Бръснар: {barber?.name}</div>
             </div>
-            <button style={s.btn} onClick={() => { setStep('service'); setService(null); setSelDate(''); setSelTime('') }}>
+            <button style={s.btn} onClick={() => { setStep('barber'); setBarberId(null); setService(null); setSelDate(''); setSelTime('') }}>
               Нова резервация
             </button>
           </div>
         )}
 
-        {step === 'service' && (
+        {step === 'barber' && (
           <div className="fade">
             <div style={{ marginBottom: 20, marginTop: 28 }}>
-              <div style={s.label}>Изберете услуга</div>
+              <div style={s.label}>Изберете бръснар</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {BARBERS.map(b => (
+                  <button key={b.id}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'stretch',
+                      background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8,
+                      overflow: 'hidden', cursor: 'pointer', padding: 0, transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
+                    onClick={() => { setBarberId(b.id); setService(null); setStep('service') }}
+                  >
+                    <img src={b.photo} alt={b.name} style={{ width: '100%', aspectRatio: '3 / 4', objectFit: 'cover', display: 'block' }} />
+                    <div style={{ padding: '14px 8px', textAlign: 'center', borderTop: '1px solid var(--border)' }}>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>{b.name}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 'service' && (
+          <div className="fade">
+            <button style={s.back} onClick={() => setStep('barber')}>← Назад</button>
+            <div style={{ marginBottom: 20 }}>
+              <div style={s.label}>Изберете услуга — {barber?.name}</div>
               {SERVICES.map(svc => (
                 <button key={svc.name} style={s.svcBtn}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold)' }}
@@ -281,7 +313,7 @@ export default function Page() {
             <button style={s.back} onClick={() => setStep('time')}>← Назад</button>
             <div style={s.summary}>
               <div><span style={{ color: 'var(--gold)' }}>{service?.name}</span></div>
-              <div style={{ marginTop: 4 }}>{selDate} · {selTime} ч. · Бръснар: Еди</div>
+              <div style={{ marginTop: 4 }}>{selDate} · {selTime} ч. · Бръснар: {barber?.name}</div>
             </div>
             <div style={s.label}>Вашите данни</div>
             <input style={s.input} placeholder="Пълно име" value={name} onChange={e => setName(e.target.value)} />

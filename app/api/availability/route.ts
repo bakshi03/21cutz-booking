@@ -33,7 +33,8 @@ function getSlotsForEvent(startStr: string, endStr: string): string[] {
 
 export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get('date')
-  console.log('Availability called for date:', date)
+  const barberId = request.nextUrl.searchParams.get('barberId') === 'emo' ? 'emo' : 'edi'
+  console.log('Availability called for date:', date, 'barber:', barberId)
   if (!date) return NextResponse.json({ takenSlots: [], fullyBlocked: false })
 
   try {
@@ -46,14 +47,15 @@ export async function GET(request: NextRequest) {
       scopes: ['https://www.googleapis.com/auth/calendar'],
     })
     const calendar = google.calendar({ version: 'v3', auth })
+    const calendarId = barberId === 'emo' ? process.env.GOOGLE_CALENDAR_ID_EMO : process.env.GOOGLE_CALENDAR_ID
 
     const timeMin = new Date(`${date}T00:00:00+03:00`).toISOString()
     const timeMax = new Date(`${date}T23:59:59+03:00`).toISOString()
     console.log('Fetching events between:', timeMin, 'and', timeMax)
-    console.log('Calendar ID:', process.env.GOOGLE_CALENDAR_ID)
+    console.log('Calendar ID:', calendarId)
 
     const res = await calendar.events.list({
-      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      calendarId: calendarId || 'primary',
       timeMin,
       timeMax,
       singleEvents: true,

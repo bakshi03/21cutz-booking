@@ -1,6 +1,10 @@
 // This file is safe to import on client side - no googleapis here
 
-export const WORKING_HOURS: Record<number, { start: string; end: string } | null> = {
+export type BarberId = 'edi' | 'emo'
+
+export type WorkingHours = Record<number, { start: string; end: string } | null>
+
+export const EDI_WORKING_HOURS: WorkingHours = {
   0: null,
   1: { start: '9:00', end: '18:30' },
   2: null,
@@ -10,8 +14,18 @@ export const WORKING_HOURS: Record<number, { start: string; end: string } | null
   6: { start: '11:00', end: '16:00' },
 }
 
-export function generateTimeSlots(dayOfWeek: number): string[] {
-  const hours = WORKING_HOURS[dayOfWeek]
+export const EMO_WORKING_HOURS: WorkingHours = {
+  0: null,
+  1: { start: '9:00', end: '19:00' },
+  2: { start: '9:00', end: '19:00' },
+  3: { start: '9:00', end: '19:00' },
+  4: { start: '9:00', end: '19:00' },
+  5: { start: '9:00', end: '19:00' },
+  6: { start: '9:00', end: '19:00' },
+}
+
+export function generateTimeSlots(dayOfWeek: number, workingHours: WorkingHours): string[] {
+  const hours = workingHours[dayOfWeek]
   if (!hours) return []
   const slots: string[] = []
   const [sh, sm] = hours.start.split(':').map(Number)
@@ -25,10 +39,41 @@ export function generateTimeSlots(dayOfWeek: number): string[] {
   return slots
 }
 
-export const SERVICES = [
+export const EDI_SERVICES = [
   { name: 'Мъжко подстригване', price: '20€', duration: 30 },
   { name: 'Подстригване и брада', price: '25€', duration: 60 },
   { name: 'Оформяне на брада', price: '15€', duration: 30 },
   { name: 'Вежди', price: '10€', duration: 30 },
   { name: 'VIP комбо (подстригване, оформяне на брада, вежди, маска за лице, тонизиращ масаж)', price: '40€', duration: 60 },
+]
+
+export const EMO_SERVICES = [
+  { name: 'Мъжко подстригване', price: '15€', duration: 30 },
+  { name: 'Подстригване и брада', price: '20€', duration: 60 },
+  { name: 'Оформяне на брада', price: '10€', duration: 30 },
+  { name: 'Вежди', price: '5€', duration: 30 },
+  { name: 'VIP комбо (подстригване, оформяне на брада, вежди, маска за лице, тонизиращ масаж)', price: '35€', duration: 60 },
+]
+
+export const BARBERS: {
+  id: BarberId
+  name: string
+  photo: string
+  services: typeof EDI_SERVICES
+  workingHours: WorkingHours
+}[] = [
+  {
+    id: 'edi',
+    name: 'Еди',
+    photo: '/edi.jpeg',
+    services: EDI_SERVICES,
+    workingHours: EDI_WORKING_HOURS,
+  },
+  {
+    id: 'emo',
+    name: 'Емо',
+    photo: '/emo.jpeg',
+    services: EMO_SERVICES,
+    workingHours: EMO_WORKING_HOURS,
+  },
 ]

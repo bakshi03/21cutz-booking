@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateTimeSlots } from '@/lib/config'
+import { generateTimeSlots, EDI_WORKING_HOURS, EMO_WORKING_HOURS } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +18,8 @@ function toSofiaTime(dateTimeStr: string): string {
 
 export async function GET(request: NextRequest) {
   const month = request.nextUrl.searchParams.get('month') // e.g. "2026-05"
+  const barberId = request.nextUrl.searchParams.get('barberId') === 'emo' ? 'emo' : 'edi'
+  const workingHours = barberId === 'emo' ? EMO_WORKING_HOURS : EDI_WORKING_HOURS
   if (!month) return NextResponse.json({ blockedDates: [] })
 
   try {
@@ -30,6 +32,7 @@ export async function GET(request: NextRequest) {
       scopes: ['https://www.googleapis.com/auth/calendar'],
     })
     const calendar = google.calendar({ version: 'v3', auth })
+    const calendarId = barberId === 'emo' ? process.env.GOOGLE_CALENDAR_ID_EMO : process.env.GOOGLE_CALENDAR_ID
 
     const [year, mon] = month.split('-').map(Number)
     const firstDay = new Date(year, mon - 1, 1)
@@ -39,7 +42,7 @@ export async function GET(request: NextRequest) {
     const timeMax = new Date(`${year}-${String(mon).padStart(2,'0')}-${lastDay.getDate()}T23:59:59+03:00`).toISOString()
 
     const res = await calendar.events.list({
-      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      calendarId: calendarId || 'primary',
       timeMin,
       timeMax,
       singleEvents: true,
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
     for (const [dateKey, events] of Object.entries(eventsByDate)) {
       const d = new Date(dateKey + 'T12:00:00')
       const dow = d.getDay()
-      const allSlots = generateTimeSlots(dow)
+      const allSlots = generateTimeSlots(dow, workingHours)
       if (allSlots.length === 0) continue // Already closed day
 
       // Check for all-day block
