@@ -48,7 +48,7 @@ export const EDI_SERVICES = [
 ]
 
 export const EMO_SERVICES = [
-  { name: 'Мъжко подстригване', price: '15€', duration: 30 },
+  { name: 'Мъжко подстригване', price: '15€', duration: 60 },
   { name: 'Подстригване и брада', price: '20€', duration: 60 },
   { name: 'Оформяне на брада', price: '10€', duration: 30 },
   { name: 'Вежди', price: '5€', duration: 30 },
