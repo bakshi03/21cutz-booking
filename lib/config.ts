@@ -6,22 +6,22 @@ export type WorkingHours = Record<number, { start: string; end: string } | null>
 
 export const EDI_WORKING_HOURS: WorkingHours = {
   0: null,
-  1: { start: '9:00', end: '18:30' },
+  1: { start: '10:00', end: '18:30' },
   2: null,
-  3: { start: '9:00', end: '18:30' },
-  4: { start: '9:00', end: '18:30' },
-  5: { start: '9:00', end: '18:30' },
-  6: { start: '11:00', end: '16:00' },
+  3: { start: '10:00', end: '18:30' },
+  4: { start: '10:00', end: '18:30' },
+  5: { start: '10:00', end: '18:30' },
+  6: { start: '10:00', end: '17:00' },
 }
 
 export const EMO_WORKING_HOURS: WorkingHours = {
   0: null,
-  1: { start: '9:00', end: '19:00' },
-  2: { start: '9:00', end: '19:00' },
-  3: { start: '9:00', end: '19:00' },
-  4: { start: '9:00', end: '19:00' },
-  5: { start: '9:00', end: '19:00' },
-  6: { start: '9:00', end: '19:00' },
+  1: { start: '10:00', end: '19:00' },
+  2: { start: '10:00', end: '19:00' },
+  3: { start: '10:00', end: '19:00' },
+  4: { start: '10:00', end: '19:00' },
+  5: { start: '10:00', end: '19:00' },
+  6: { start: '10:00', end: '17:00' },
 }
 
 export function generateTimeSlots(dayOfWeek: number, workingHours: WorkingHours): string[] {
