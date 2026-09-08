@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import ConsentBanner from '../components/ConsentBanner'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -10,6 +11,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="bg">
       <head>
+        {/* Consent Mode v2: default denied until the visitor accepts */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+if(/(?:^|; )cc21cutz=granted/.test(document.cookie)){gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});}`,
+          }}
+        />
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
@@ -34,6 +43,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </noscript>
         {/* End Google Tag Manager (noscript) */}
         {children}
+        <ConsentBanner />
       </body>
     </html>
   )
