@@ -127,13 +127,16 @@ export default function Page() {
       })
       const d = await r.json()
       if (d.success) {
-        ;(window as unknown as { dataLayer?: object[] }).dataLayer?.push({
-          event: 'booking_complete',
-          barber: barberId,
-          service_name: service?.name,
-          value: parseFloat(service?.price ?? '') || 0,
-          currency: 'EUR',
-        })
+        ;(window as unknown as { gtag?: (...args: unknown[]) => void }).gtag?.(
+          'event',
+          'booking_complete',
+          {
+            barber: barberId,
+            service_name: service?.name,
+            value: parseFloat(service?.price ?? '') || 0,
+            currency: 'EUR',
+          }
+        )
         setStep('success')
       } else setError('Грешка при запазване. Опитайте отново.')
     } catch { setError('Грешка при свързване.') }
