@@ -58,42 +58,42 @@ export async function POST(request: NextRequest) {
           to: email,
           subject: '✂️ Резервацията ви е потвърдена — 21 Cutz',
           html: `
-            <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #0f0f0f; color: #e5e5e5; border-radius: 10px; overflow: hidden;">
-              <div style="background: #0f0f0f; padding: 32px 32px 0; text-align: center; border-bottom: 1px solid #2a2a2a;">
-                <div style="font-size: 28px; font-weight: 900; color: #c9a84c; letter-spacing: -0.02em;">✂ 21 Cutz</div>
-                <div style="font-size: 11px; color: #666; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; padding-bottom: 24px;">Премиум бръснарски салон</div>
+            <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #ffffff; color: #26211a; border: 1px solid #e8dfc9; border-radius: 10px; overflow: hidden;">
+              <div style="background: #faf8f2; padding: 32px 32px 0; text-align: center; border-bottom: 1px solid #e8dfc9;">
+                <div style="font-size: 28px; font-weight: 900; color: #8f6d1f; letter-spacing: -0.02em;">✂ 21 Cutz</div>
+                <div style="font-size: 11px; color: #8b7f68; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; padding-bottom: 24px;">Премиум бръснарски салон</div>
               </div>
               <div style="padding: 32px;">
-                <div style="font-size: 20px; font-weight: 700; color: #c9a84c; margin-bottom: 8px;">Резервацията е потвърдена!</div>
-                <p style="color: #999; font-size: 14px; margin: 0 0 24px;">Здравейте, ${name}! Вашият час е успешно запазен.</p>
-                <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <div style="font-size: 20px; font-weight: 700; color: #8f6d1f; margin-bottom: 8px;">Резервацията е потвърдена!</div>
+                <p style="color: #8b7f68; font-size: 14px; margin: 0 0 24px;">Здравейте, ${name}! Вашият час е успешно запазен.</p>
+                <div style="background: #faf8f2; border: 1px solid #e8dfc9; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                   <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                      <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Услуга</td>
-                      <td style="color: #e5e5e5; font-size: 14px; text-align: right; padding: 6px 0;">${service}</td>
+                      <td style="color: #8b7f68; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Услуга</td>
+                      <td style="color: #26211a; font-size: 14px; text-align: right; padding: 6px 0;">${service}</td>
                     </tr>
                     <tr>
-                      <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Дата</td>
-                      <td style="color: #e5e5e5; font-size: 14px; text-align: right; padding: 6px 0;">${date}</td>
+                      <td style="color: #8b7f68; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Дата</td>
+                      <td style="color: #26211a; font-size: 14px; text-align: right; padding: 6px 0;">${date}</td>
                     </tr>
                     <tr>
-                      <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Час</td>
-                      <td style="color: #e5e5e5; font-size: 14px; text-align: right; padding: 6px 0;">${time} ч.</td>
+                      <td style="color: #8b7f68; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Час</td>
+                      <td style="color: #26211a; font-size: 14px; text-align: right; padding: 6px 0;">${time} ч.</td>
                     </tr>
                     <tr>
-                      <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Бръснар</td>
-                      <td style="color: #e5e5e5; font-size: 14px; text-align: right; padding: 6px 0;">${barberName}</td>
+                      <td style="color: #8b7f68; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 0;">Бръснар</td>
+                      <td style="color: #26211a; font-size: 14px; text-align: right; padding: 6px 0;">${barberName}</td>
                     </tr>
-                    <tr style="border-top: 1px solid #2a2a2a;">
-                      <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 12px 0 6px;">Цена</td>
-                      <td style="color: #c9a84c; font-size: 18px; font-weight: 700; text-align: right; padding: 12px 0 6px;">${price || ''}</td>
+                    <tr style="border-top: 1px solid #e8dfc9;">
+                      <td style="color: #8b7f68; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding: 12px 0 6px;">Цена</td>
+                      <td style="color: #8f6d1f; font-size: 18px; font-weight: 700; text-align: right; padding: 12px 0 6px;">${price || ''}</td>
                     </tr>
                   </table>
                 </div>
-                <p style="color: #666; font-size: 13px; text-align: center; margin: 0;">При въпроси или промени се свържете с нас.</p>
+                <p style="color: #8b7f68; font-size: 13px; text-align: center; margin: 0;">При въпроси или промени се свържете с нас.</p>
               </div>
-              <div style="padding: 16px 32px; text-align: center; border-top: 1px solid #2a2a2a;">
-                <div style="font-size: 12px; color: #444;">21 Cutz — Премиум бръснарски салон</div>
+              <div style="padding: 16px 32px; text-align: center; border-top: 1px solid #e8dfc9;">
+                <div style="font-size: 12px; color: #a89c85;">21 Cutz — Премиум бръснарски салон</div>
               </div>
             </div>
           `,

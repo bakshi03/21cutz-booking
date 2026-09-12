@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import ConsentBanner from '../components/ConsentBanner'
 import './globals.css'
 
 export const metadata: Metadata = {
   title: '21 Cutz — Резервации',
   description: 'Запазете час при нашите професионални бръснари',
+}
+
+export const viewport: Viewport = {
+  themeColor: '#faf8f2',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

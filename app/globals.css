@@ -6,20 +6,23 @@
 
 body {
   font-family: 'Helvetica Neue', Arial, sans-serif;
-  background: #0f0f0f;
-  color: #f0ebe0;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
 }
 
 :root {
-  --gold: #c9a84c;
+  --gold: #c9a84c;      /* fills: buttons, selected states */
+  --gold-deep: #8f6d1f; /* gold used as text on the light background */
   --gold-dim: #a07830;
-  --bg: #0f0f0f;
-  --bg2: #1a1a1a;
-  --bg3: #252525;
-  --border: rgba(201,168,76,0.2);
-  --text: #f0ebe0;
-  --muted: #7a7060;
+  --gold-tint: rgba(201,168,76,0.14);
+  --on-gold: #221a08;   /* text on gold fills */
+  --bg: #faf8f2;
+  --bg2: #ffffff;
+  --bg3: #f3eee1;
+  --border: rgba(160,120,48,0.28);
+  --text: #26211a;
+  --muted: #8b7f68;
 }
 
 @keyframes fadeUp {

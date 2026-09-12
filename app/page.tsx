@@ -154,12 +154,12 @@ export default function Page() {
   const s: Record<string, React.CSSProperties> = {
     wrap: { maxWidth: 440, margin: '0 auto', padding: '32px 20px 80px' },
     header: { textAlign: 'center', padding: '40px 20px 20px', borderBottom: '1px solid var(--border)' },
-    logo: { fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--gold)' },
+    logo: { fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--gold-deep)' },
     sub: { fontSize: 13, color: 'var(--muted)', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 4 },
     label: { fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 12 },
     svcBtn: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '16px 18px', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer', color: 'var(--text)', marginBottom: 8, transition: 'all 0.15s' },
     input: { width: '100%', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 6, padding: '12px 14px', color: 'var(--text)', fontSize: 15, outline: 'none', marginBottom: 12 },
-    btn: { width: '100%', background: 'var(--gold)', color: '#0f0f0f', border: 'none', borderRadius: 6, padding: '14px', fontSize: 15, fontWeight: 600, cursor: 'pointer', letterSpacing: '0.05em' },
+    btn: { width: '100%', background: 'var(--gold)', color: 'var(--on-gold)', border: 'none', borderRadius: 6, padding: '14px', fontSize: 15, fontWeight: 600, cursor: 'pointer', letterSpacing: '0.05em' },
     back: { background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 13, marginBottom: 20 },
     calHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
     calGrid: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 },
@@ -180,10 +180,10 @@ export default function Page() {
         {step === 'success' && (
           <div style={s.success} className="fade">
             <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--gold)', marginBottom: 12 }}>Резервацията е потвърдена!</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--gold-deep)', marginBottom: 12 }}>Резервацията е потвърдена!</div>
             <div style={{ color: 'var(--muted)', lineHeight: 1.8, marginBottom: 24 }}>
               <div>{service?.name}</div>
-              <div style={{ color: 'var(--gold)' }}>{selDate} в {selTime} ч.</div>
+              <div style={{ color: 'var(--gold-deep)' }}>{selDate} в {selTime} ч.</div>
               <div>Бръснар: {barber?.name}</div>
             </div>
             <button style={s.btn} onClick={() => { setStep('barber'); setBarberId(null); setService(null); setSelDate(''); setSelTime('') }}>
@@ -210,7 +210,7 @@ export default function Page() {
                   >
                     <img src={b.photo} alt={b.name} style={{ width: '100%', aspectRatio: '3 / 4', objectFit: 'cover', display: 'block' }} />
                     <div style={{ padding: '14px 8px', textAlign: 'center', borderTop: '1px solid var(--border)' }}>
-                      <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>{b.name}</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--gold-deep)', letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>{b.name}</div>
                     </div>
                   </button>
                 ))}
@@ -234,7 +234,7 @@ export default function Page() {
                     <div style={{ fontSize: 15 }}>{svc.name}</div>
                     <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{svc.duration} мин.</div>
                   </div>
-                  <div style={{ color: 'var(--gold)', fontWeight: 700, fontSize: 17 }}>{svc.price}</div>
+                  <div style={{ color: 'var(--gold-deep)', fontWeight: 700, fontSize: 17 }}>{svc.price}</div>
                 </button>
               ))}
             </div>
@@ -244,16 +244,16 @@ export default function Page() {
         {step === 'date' && (
           <div className="fade">
             <button style={s.back} onClick={() => setStep('service')}>← Назад</button>
-            <div style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 14px', marginBottom: 20, fontSize: 13, color: 'var(--gold)' }}>
+            <div style={{ background: 'var(--gold-tint)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 14px', marginBottom: 20, fontSize: 13, color: 'var(--gold-deep)' }}>
               {service?.name} — {service?.price}
             </div>
             <div style={s.label}>
               {loadingMonth ? 'Зареждане на календара...' : 'Изберете дата'}
             </div>
             <div style={s.calHead}>
-            <button style={{ ...s.back, marginBottom: 0, fontSize: 24, color: 'var(--gold)', padding: '0 8px', lineHeight: 1 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()-1))}>‹</button>
+            <button style={{ ...s.back, marginBottom: 0, fontSize: 24, color: 'var(--gold-deep)', padding: '0 8px', lineHeight: 1 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()-1))}>‹</button>
               <span style={{ fontWeight: 600 }}>{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
-              <button style={{ ...s.back, marginBottom: 0, fontSize: 24, color: 'var(--gold)', padding: '0 8px', lineHeight: 1 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()+1))}>›</button>
+              <button style={{ ...s.back, marginBottom: 0, fontSize: 24, color: 'var(--gold-deep)', padding: '0 8px', lineHeight: 1 }} onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth()+1))}>›</button>
             </div>
             <div style={s.calGrid}>
               {DAYS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: 11, color: 'var(--muted)', padding: '4px 0' }}>{d}</div>)}
@@ -270,7 +270,7 @@ export default function Page() {
                       aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: 4, fontSize: 13, cursor: avail ? 'pointer' : 'not-allowed',
                       background: sel ? 'var(--gold)' : 'none',
-                      color: sel ? '#0f0f0f' : avail ? 'var(--text)' : 'var(--muted)',
+                      color: sel ? 'var(--on-gold)' : avail ? 'var(--text)' : 'var(--muted)',
                       border: sel ? 'none' : blocked ? '1px solid rgba(239,68,68,0.3)' : '1px solid transparent',
                       opacity: avail ? 1 : 0.3,
                       fontWeight: sel ? 700 : 400,
@@ -286,7 +286,7 @@ export default function Page() {
           <div className="fade">
             <button style={s.back} onClick={() => setStep('date')}>← Назад</button>
             <div style={{ ...s.summary }}>
-              <span style={{ color: 'var(--gold)' }}>{service?.name}</span> · {selDate}
+              <span style={{ color: 'var(--gold-deep)' }}>{service?.name}</span> · {selDate}
             </div>
             <div style={s.label}>{loadingSlots ? 'Зареждане...' : 'Изберете час'}</div>
             {!loadingSlots && slotsLoaded && fullyBlocked && (
@@ -306,7 +306,7 @@ export default function Page() {
                     padding: '10px 4px', textAlign: 'center', borderRadius: 4, fontSize: 13,
                     cursor: 'pointer', transition: 'all 0.15s',
                     background: selTime === slot ? 'var(--gold)' : 'var(--bg2)',
-                    color: selTime === slot ? '#0f0f0f' : 'var(--text)',
+                    color: selTime === slot ? 'var(--on-gold)' : 'var(--text)',
                     border: `1px solid ${selTime === slot ? 'var(--gold)' : 'var(--border)'}`,
                     fontWeight: selTime === slot ? 700 : 400,
                   }}
@@ -323,14 +323,14 @@ export default function Page() {
           <div className="fade">
             <button style={s.back} onClick={() => setStep('time')}>← Назад</button>
             <div style={s.summary}>
-              <div><span style={{ color: 'var(--gold)' }}>{service?.name}</span></div>
+              <div><span style={{ color: 'var(--gold-deep)' }}>{service?.name}</span></div>
               <div style={{ marginTop: 4 }}>{selDate} · {selTime} ч. · Бръснар: {barber?.name}</div>
             </div>
             <div style={s.label}>Вашите данни</div>
             <input style={s.input} placeholder="Пълно име" value={name} onChange={e => setName(e.target.value)} />
             <input style={s.input} placeholder="Имейл" type="email" value={email} onChange={e => setEmail(e.target.value)} />
             <input style={s.input} placeholder="Телефон" type="tel" value={phone} onChange={e => setPhone(e.target.value)} />
-            {error && <p style={{ color: '#f87171', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+            {error && <p style={{ color: '#dc2626', fontSize: 13, marginBottom: 12 }}>{error}</p>}
             <button style={{ ...s.btn, opacity: submitting ? 0.6 : 1 }} disabled={submitting} onClick={handleBook}>
               {submitting ? 'Запазване...' : 'Запази час'}
             </button>
@@ -342,7 +342,7 @@ export default function Page() {
       {/* Price notice modal */}
       {showPriceNotice && pendingService && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+          position: 'fixed', inset: 0, background: 'rgba(38,33,26,0.45)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 100, padding: '0 20px',
         }}>
@@ -350,14 +350,14 @@ export default function Page() {
             background: 'var(--bg2)', border: '1px solid var(--gold)',
             borderRadius: 10, padding: '28px 24px', maxWidth: 380, width: '100%',
           }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', marginBottom: 12 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-deep)', marginBottom: 12 }}>
               💈 Актуализирани цени
             </div>
             <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-              От <span style={{ color: 'var(--text)' }}>09.06.2026</span> цените в салон <span style={{ color: 'var(--gold)' }}>21 Cutz</span> са актуализирани. Продължаваме да предлагаме същото премиум качество на обслужване.
+              От <span style={{ color: 'var(--text)' }}>09.06.2026</span> цените в салон <span style={{ color: 'var(--gold-deep)' }}>21 Cutz</span> са актуализирани. Продължаваме да предлагаме същото премиум качество на обслужване.
             </p>
             <div style={{
-              background: 'rgba(201,168,76,0.08)', border: '1px solid var(--border)',
+              background: 'var(--gold-tint)', border: '1px solid var(--border)',
               borderRadius: 6, padding: '12px 14px', marginBottom: 20,
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
@@ -365,7 +365,7 @@ export default function Page() {
                 <div style={{ fontSize: 14, color: 'var(--text)' }}>{pendingService.name}</div>
                 <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{pendingService.duration} мин.</div>
               </div>
-              <div style={{ color: 'var(--gold)', fontWeight: 700, fontSize: 18 }}>{pendingService.price}</div>
+              <div style={{ color: 'var(--gold-deep)', fontWeight: 700, fontSize: 18 }}>{pendingService.price}</div>
             </div>
             <button style={s.btn} onClick={() => {
               setService(pendingService)

@@ -53,7 +53,7 @@ export default function ConsentBanner() {
         background: 'var(--bg2)',
         border: '1px solid var(--border)',
         borderRadius: 10,
-        boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+        boxShadow: '0 8px 30px rgba(38,33,26,0.18)',
       }}
     >
       <p style={{ margin: '0 0 14px', color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
@@ -72,7 +72,7 @@ export default function ConsentBanner() {
             cursor: 'pointer',
             background: 'var(--gold)',
             border: '1px solid var(--gold)',
-            color: 'var(--bg)',
+            color: 'var(--on-gold)',
           }}
         >
           Приемам
