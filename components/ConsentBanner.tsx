@@ -67,8 +67,16 @@ export default function ConsentBanner() {
       }}
     >
       <p style={{ margin: '0 0 14px', color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-        Използваме бисквитки за анализ на посещенията и за измерване на рекламни кампании (Google).
-        Ще ги включим само с вашето съгласие.
+        Използваме бисквитки за анализ на посещенията и за измерване на рекламни кампании. Ще ги
+        включим само с вашето съгласие.{' '}
+        <a
+          href="https://21cutz.com/cookies"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--gold-deep)', textDecoration: 'underline' }}
+        >
+          Научете повече
+        </a>
       </p>
       <div style={{ display: 'flex', gap: 10 }}>
         <button
