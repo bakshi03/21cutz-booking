@@ -29,6 +29,8 @@ export default function ConsentBanner() {
       ad_user_data: 'granted',
       ad_personalization: 'granted',
       analytics_storage: 'granted',
+      functionality_storage: 'granted',
+      personalization_storage: 'granted',
     })
     ;(window as unknown as { dataLayer?: object[] }).dataLayer?.push({ event: 'consent_granted' })
     setVisible(false)
@@ -36,6 +38,14 @@ export default function ConsentBanner() {
 
   const decline = () => {
     setConsentCookie('denied')
+    gtag('consent', 'update', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+    })
     setVisible(false)
   }
 
@@ -57,8 +67,8 @@ export default function ConsentBanner() {
       }}
     >
       <p style={{ margin: '0 0 14px', color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-        Използваме бисквитки за анализ на посещенията, за да подобряваме сайта. Ще ги включим само с
-        вашето съгласие.
+        Използваме бисквитки за анализ на посещенията и за измерване на рекламни кампании (Google).
+        Ще ги включим само с вашето съгласие.
       </p>
       <div style={{ display: 'flex', gap: 10 }}>
         <button
