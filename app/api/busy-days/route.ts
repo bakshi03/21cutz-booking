@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateTimeSlots, EDI_WORKING_HOURS, EMO_WORKING_HOURS } from '@/lib/config'
+import { generateTimeSlots, sofiaOffset, EDI_WORKING_HOURS, EMO_WORKING_HOURS } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,8 +38,10 @@ export async function GET(request: NextRequest) {
     const firstDay = new Date(year, mon - 1, 1)
     const lastDay = new Date(year, mon, 0)
 
-    const timeMin = new Date(`${month}-01T00:00:00+03:00`).toISOString()
-    const timeMax = new Date(`${year}-${String(mon).padStart(2,'0')}-${lastDay.getDate()}T23:59:59+03:00`).toISOString()
+    const firstDate = `${month}-01`
+    const lastDate = `${year}-${String(mon).padStart(2,'0')}-${String(lastDay.getDate()).padStart(2,'0')}`
+    const timeMin = new Date(`${firstDate}T00:00:00${sofiaOffset(firstDate)}`).toISOString()
+    const timeMax = new Date(`${lastDate}T23:59:59${sofiaOffset(lastDate)}`).toISOString()
 
     const res = await calendar.events.list({
       calendarId: calendarId || 'primary',

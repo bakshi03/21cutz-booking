@@ -32,16 +32,17 @@ export async function POST(request: NextRequest) {
     const endM = (totalMinutes % 60).toString().padStart(2, '0')
 
     console.log('Time received:', time)
-    console.log('Start dateTime:', `${date}T${h}:${m}:00+03:00`)
-    console.log('End dateTime:', `${date}T${endH}:${endM}:00+03:00`)
+    console.log('Start dateTime:', `${date}T${h}:${m}:00 Europe/Sofia`)
+    console.log('End dateTime:', `${date}T${endH}:${endM}:00 Europe/Sofia`)
 
+    // Без хардкоднат офсет — Google сам прилага лятно/зимно време за Europe/Sofia
     await calendar.events.insert({
       calendarId: calendarId || 'primary',
       requestBody: {
         summary: `✂️ ${service} — ${name}`,
         description: `Клиент: ${name}\nИмейл: ${email}\nТелефон: ${phone}\nБръснар: ${barberName}`,
-        start: { dateTime: `${date}T${h}:${m}:00+03:00` },
-        end: { dateTime: `${date}T${endH}:${endM}:00+03:00` },
+        start: { dateTime: `${date}T${h}:${m}:00`, timeZone: 'Europe/Sofia' },
+        end: { dateTime: `${date}T${endH}:${endM}:00`, timeZone: 'Europe/Sofia' },
       },
     })
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sofiaOffset } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,8 +50,9 @@ export async function GET(request: NextRequest) {
     const calendar = google.calendar({ version: 'v3', auth })
     const calendarId = barberId === 'emo' ? process.env.GOOGLE_CALENDAR_ID_EMO : process.env.GOOGLE_CALENDAR_ID
 
-    const timeMin = new Date(`${date}T00:00:00+03:00`).toISOString()
-    const timeMax = new Date(`${date}T23:59:59+03:00`).toISOString()
+    const off = sofiaOffset(date)
+    const timeMin = new Date(`${date}T00:00:00${off}`).toISOString()
+    const timeMax = new Date(`${date}T23:59:59${off}`).toISOString()
     console.log('Fetching events between:', timeMin, 'and', timeMax)
     console.log('Calendar ID:', calendarId)
 

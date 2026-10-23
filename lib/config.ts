@@ -24,6 +24,16 @@ export const EMO_WORKING_HOURS: WorkingHours = {
   6: { start: '10:00', end: '17:00' },
 }
 
+// Връща UTC отместването на София за дадена дата ("+03:00" лятно / "+02:00" зимно)
+export function sofiaOffset(date: string): string {
+  const noon = new Date(`${date}T12:00:00Z`)
+  const name = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Sofia', timeZoneName: 'longOffset' })
+    .formatToParts(noon)
+    .find(p => p.type === 'timeZoneName')?.value || 'GMT+02:00'
+  const off = name.replace('GMT', '')
+  return off === '' ? '+00:00' : off
+}
+
 export function generateTimeSlots(dayOfWeek: number, workingHours: WorkingHours): string[] {
   const hours = workingHours[dayOfWeek]
   if (!hours) return []
